@@ -13,11 +13,12 @@ keys.addEventListener("click", (e) => {
     const keyContent = key.textContent;
     const displayedNum = display.textContent;
     // Setting the textContent property, any child nodes are removed and replaced by a single Text node containing the specified string. Ie. If the calculator shows 0, we want to replace the calculator’s display with the clicked key
+    const previousKeyType = calculator.dataset.previousKeyType;
+    // To replace the displayed number with clicked number
 
     if (!action) {
-      console.log("number key!");
       // The exclamation mark (“!”) symbol, called a “bang,” is the logical “not” operator. Placed in front of a boolean value it will reverse the value, returning the opposite. ie. Not an action in this case and is a number
-      if (displayedNum === "0") {
+      if (displayedNum === "0" || previousKeyType === "operator") {
         display.textContent = keyContent;
       } else {
         display.textContent = displayedNum + keyContent;
@@ -32,6 +33,10 @@ keys.addEventListener("click", (e) => {
     ) {
       key.classList.add("is-depressed");
       // When clicked, the button will be highlighted so the user knows the operator is active
+      calculator.dataset.previousKeyType = "operator";
+      // Added a custom attribute to tell if the previous key was an operator key, so that it can update the display to the clicked key.
+      calculator.dataset.firstValue = displayedNum;
+      calculator.dataset.operator = action;
     }
     if (action === "decimal") {
       display.textContent = displayedNum + ".";
@@ -39,14 +44,36 @@ keys.addEventListener("click", (e) => {
     }
 
     if (action === "clear") {
-      console.log("clear key!");
     }
 
     if (action === "calculate") {
-      console.log("equal key!");
+      const firstValue = calculator.dataset.firstValue;
+      const operator = calculator.dataset.operator;
+      const secondValue = displayedNum;
+      // To get the first number & the operator, we need to store the calculator’s displayed value before we wipe it clean. Need to add it to a custom attribute when the operator button gets clicked
+      display.textContent = calculate(firstValue, operator, secondValue);
     }
-    Array.from(key.parentNode.children).forEach((k) =>
-      k.classList.remove("is-depressed")
+
+    Array.from(key.parentNode.children).forEach(
+      (k) => k.classList.remove("is-depressed")
+      // To release the pressed state, this removes the is-depressed class from all keys through a forEach loop
     );
   }
 });
+
+// Create a calculate function. It should take in three parameters: the first number, the operator, and the second number.
+const calculate = (n1, operator, n2) => {
+  let result = "";
+  //  Need to convert strings to numbers so that it doesn't concatenate numbers (1 + 1 = 11) instead of calculating. parseFloat converts a string into a float (a number with decimal places)
+  if (operator === "add") {
+    result = parseFloat(n1) + parseFloat(n2);
+  } else if (operator === "subtract") {
+    result = parseFloat(n1) - parseFloat(n2);
+  } else if (operator === "multiply") {
+    result = parseFloat(n1) * parseFloat(n2);
+  } else if (operator === "divide") {
+    result = parseFloat(n1) / parseFloat(n2);
+  }
+
+  return result;
+};
