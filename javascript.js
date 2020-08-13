@@ -37,13 +37,16 @@ keys.addEventListener("click", (e) => {
       // Added a custom attribute to tell if the previous key was an operator key, so that it can update the display to the clicked key.
       calculator.dataset.firstValue = displayedNum;
       calculator.dataset.operator = action;
+      calculator.dataset.previousKey = "number";
     }
     if (action === "decimal") {
       display.textContent = displayedNum + ".";
       // Concatenate . to the displayed number
+      calculator.dataset.previousKey = "decimal";
     }
 
     if (action === "clear") {
+      calculator.dataset.previousKeyType = "clear";
     }
 
     if (action === "calculate") {
@@ -52,8 +55,8 @@ keys.addEventListener("click", (e) => {
       const secondValue = displayedNum;
       // To get the first number & the operator, we need to store the calculator’s displayed value before we wipe it clean. Need to add it to a custom attribute when the operator button gets clicked
       display.textContent = calculate(firstValue, operator, secondValue);
+      calculator.dataset.previousKeyType = "calculate";
     }
-
     Array.from(key.parentNode.children).forEach(
       (k) => k.classList.remove("is-depressed")
       // To release the pressed state, this removes the is-depressed class from all keys through a forEach loop
