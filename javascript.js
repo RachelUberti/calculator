@@ -16,6 +16,21 @@ keys.addEventListener("click", (e) => {
     const previousKeyType = calculator.dataset.previousKeyType;
     // To replace the displayed number with clicked number
 
+    const calculate = (n1, operator, n2) => {
+      let result = "";
+
+      if (operator === "add") {
+        result = parseFloat(n1) + parseFloat(n2);
+      } else if (operator === "subtract") {
+        result = parseFloat(n1) - parseFloat(n2);
+      } else if (operator === "multiply") {
+        result = parseFloat(n1) * parseFloat(n2);
+      } else if (operator === "divide") {
+        result = parseFloat(n1) / parseFloat(n2);
+      }
+
+      return result;
+    };
     if (!action) {
       // The exclamation mark (“!”) symbol, called a “bang,” is the logical “not” operator. Placed in front of a boolean value it will reverse the value, returning the opposite. ie. Not an action in this case and is a number
 
@@ -97,6 +112,7 @@ keys.addEventListener("click", (e) => {
       const operator = calculator.dataset.operator;
       const secondValue = displayedNum;
       // To get the first number & the operator, we need to store the calculator’s displayed value before we wipe it clean. Need to add it to a custom attribute when the operator button gets clicked
+
       if (firstValue) {
         if (previousKeyType === "calculate") {
           firstValue = displayedNum;
@@ -115,20 +131,3 @@ keys.addEventListener("click", (e) => {
     );
   }
 });
-
-// Create a calculate function. It should take in three parameters: the first number, the operator, and the second number.
-const calculate = (n1, operator, n2) => {
-  let result = "";
-  //  Need to convert strings to numbers so that it doesn't concatenate numbers (1 + 1 = 11) instead of calculating. parseFloat converts a string into a float (a number with decimal places)
-  if (operator === "add") {
-    result = parseFloat(n1) + parseFloat(n2);
-  } else if (operator === "subtract") {
-    result = parseFloat(n1) - parseFloat(n2);
-  } else if (operator === "multiply") {
-    result = parseFloat(n1) * parseFloat(n2);
-  } else if (operator === "divide") {
-    result = parseFloat(n1) / parseFloat(n2);
-  }
-
-  return result;
-};
