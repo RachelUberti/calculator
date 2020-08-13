@@ -18,12 +18,18 @@ keys.addEventListener("click", (e) => {
 
     if (!action) {
       // The exclamation mark (“!”) symbol, called a “bang,” is the logical “not” operator. Placed in front of a boolean value it will reverse the value, returning the opposite. ie. Not an action in this case and is a number
-      if (displayedNum === "0" || previousKeyType === "operator") {
+
+      if (
+        displayedNum === "0" ||
+        previousKeyType === "operator" ||
+        previousKeyType === "calculate"
+      ) {
         display.textContent = keyContent;
       } else {
         display.textContent = displayedNum + keyContent;
         // If the calculator shows a non-zero number, we want to append the clicked key to the displayed number. To append a number, we concatenate a string
       }
+      calculator.dataset.previousKeyType = "number";
     }
     if (
       action === "add" ||
@@ -31,31 +37,77 @@ keys.addEventListener("click", (e) => {
       action === "multiply" ||
       action === "divide"
     ) {
+      const firstValue = calculator.dataset.firstValue;
+      const operator = calculator.dataset.operator;
+      const secondValue = displayedNum;
+
+      // Note: It's sufficient to check for firstValue and operator because secondValue always exists
+      if (
+        firstValue &&
+        operator &&
+        previousKeyType !== "operator" &&
+        previousKeyType !== "calculate"
+      ) {
+        const calcValue = calculate(firstValue, operator, secondValue);
+        display.textContent = calcValue;
+        // Update calculated value as firstValue
+        calculator.dataset.firstValue = calcValue;
+      } else {
+        // If there are no calculations, set displayedNum as the firstValue
+        calculator.dataset.firstValue = displayedNum;
+      }
       key.classList.add("is-depressed");
       // When clicked, the button will be highlighted so the user knows the operator is active
       calculator.dataset.previousKeyType = "operator";
       // Added a custom attribute to tell if the previous key was an operator key, so that it can update the display to the clicked key.
-      calculator.dataset.firstValue = displayedNum;
       calculator.dataset.operator = action;
-      calculator.dataset.previousKey = "number";
     }
     if (action === "decimal") {
-      display.textContent = displayedNum + ".";
-      // Concatenate . to the displayed number
+      if (!displayedNum.includes(".")) {
+        display.textContent = displayedNum + ".";
+        // Concatenate . to the displayed number and check if the string already has dot
+      } else if (
+        previousKeyType === "operator" ||
+        previousKeyType === "calculate"
+      ) {
+        display.textContent = "0.";
+      }
       calculator.dataset.previousKey = "decimal";
     }
 
     if (action === "clear") {
+      if (key.textContent === "AC") {
+        calculator.dataset.firstValue = "";
+        calculator.dataset.modValue = "";
+        calculator.dataset.operator = "";
+        calculator.dataset.previousKeyType = "";
+      } else {
+        key.textContent = "AC";
+      }
+
+      display.textContent = 0;
       calculator.dataset.previousKeyType = "clear";
     }
-
+    if (action !== "clear") {
+      const clearButton = calculator.querySelector("[data-action=clear]");
+      clearButton.textContent = "CE";
+    }
     if (action === "calculate") {
-      const firstValue = calculator.dataset.firstValue;
+      let firstValue = calculator.dataset.firstValue;
       const operator = calculator.dataset.operator;
       const secondValue = displayedNum;
       // To get the first number & the operator, we need to store the calculator’s displayed value before we wipe it clean. Need to add it to a custom attribute when the operator button gets clicked
-      display.textContent = calculate(firstValue, operator, secondValue);
+      if (firstValue) {
+        if (previousKeyType === "calculate") {
+          firstValue = displayedNum;
+          secondValue = calculator.dataset.modValue;
+        }
+        // We know that operator keys have not been clicked yet if firstValue is not set to a number. We can use this knowledge to prevent the equals from calculating.
+        display.textContent = calculate(firstValue, operator, secondValue);
+      }
+      calculator.dataset.modValue = secondValue;
       calculator.dataset.previousKeyType = "calculate";
+      // Carry forward the previous secondValue into the new calculation. Store it in a custom attribute: modValue
     }
     Array.from(key.parentNode.children).forEach(
       (k) => k.classList.remove("is-depressed")
