@@ -16,22 +16,6 @@ keys.addEventListener("click", (e) => {
     const previousKeyType = calculator.dataset.previousKeyType;
     // To replace the displayed number with clicked number
 
-    const calculate = (n1, operator, n2) => {
-      // Calculate function takes in three parameters: the first number, the operator, and the second number.
-      let result = "";
-      // Convert strings to numbers so that they don't simply concatenate (1 + 1 = 11). parseFloat converts a string into a float (a number with decimal places).
-      if (operator === "add") {
-        result = parseFloat(n1) + parseFloat(n2);
-      } else if (operator === "subtract") {
-        result = parseFloat(n1) - parseFloat(n2);
-      } else if (operator === "multiply") {
-        result = parseFloat(n1) * parseFloat(n2);
-      } else if (operator === "divide") {
-        result = parseFloat(n1) / parseFloat(n2);
-      }
-
-      return result;
-    };
     if (!action) {
       // The exclamation mark (“!”) symbol, called a “bang,” is the logical “not” operator. Placed in front of a boolean value it will reverse the value, returning the opposite. ie. Not an action in this case and is a number
 
@@ -90,13 +74,9 @@ keys.addEventListener("click", (e) => {
       }
       calculator.dataset.previousKey = "decimal";
     }
-    if (action !== "clear") {
-      const clearButton = calculator.querySelector("[data-action=clear]");
-      clearButton.textContent = "CE"; // Clear entry (denoted by CE) clears the current entry. It keeps previous numbers in memory
-    }
+
     if (action === "clear") {
       if (key.textContent === "AC") {
-        // All Clear (denoted by AC) clears everything and resets the calculator to its initial state
         calculator.dataset.firstValue = "";
         calculator.dataset.modValue = "";
         calculator.dataset.operator = "";
@@ -108,27 +88,47 @@ keys.addEventListener("click", (e) => {
       display.textContent = 0;
       calculator.dataset.previousKeyType = "clear";
     }
-  }
-  if (action === "calculate") {
-    let firstValue = calculator.dataset.firstValue;
-    const operator = calculator.dataset.operator;
-    const secondValue = displayedNum;
-    // To get the first number & the operator, we need to store the calculator’s displayed value before we wipe it clean. Need to add it to a custom attribute when the operator button gets clicked
-
-    if (firstValue) {
-      if (previousKeyType === "calculate") {
-        firstValue = displayedNum;
-        secondValue = calculator.dataset.modValue;
-      }
-      // We know that operator keys have not been clicked yet if firstValue is not set to a number. We can use this knowledge to prevent the equals from calculating.
-      display.textContent = calculate(firstValue, operator, secondValue);
+    if (action !== "clear") {
+      const clearButton = calculator.querySelector("[data-action=clear]");
+      clearButton.textContent = "CE";
     }
-    calculator.dataset.modValue = secondValue;
-    calculator.dataset.previousKeyType = "calculate";
-    // Carry forward the previous secondValue into the new calculation. Store it in a custom attribute: modValue
+    if (action === "calculate") {
+      let firstValue = calculator.dataset.firstValue;
+      const operator = calculator.dataset.operator;
+      const secondValue = displayedNum;
+      // To get the first number & the operator, we need to store the calculator’s displayed value before we wipe it clean. Need to add it to a custom attribute when the operator button gets clicked
+      if (firstValue) {
+        if (previousKeyType === "calculate") {
+          firstValue = displayedNum;
+          secondValue = calculator.dataset.modValue;
+        }
+        // We know that operator keys have not been clicked yet if firstValue is not set to a number. We can use this knowledge to prevent the equals from calculating.
+        display.textContent = calculate(firstValue, operator, secondValue);
+      }
+      calculator.dataset.modValue = secondValue;
+      calculator.dataset.previousKeyType = "calculate";
+      // Carry forward the previous secondValue into the new calculation. Store it in a custom attribute: modValue
+    }
+    Array.from(key.parentNode.children).forEach(
+      (k) => k.classList.remove("is-depressed")
+      // To release the pressed state, this removes the is-depressed class from all keys through a forEach loop
+    );
   }
-  Array.from(key.parentNode.children).forEach(
-    (k) => k.classList.remove("is-depressed")
-    // To release the pressed state, this removes the is-depressed class from all keys through a forEach loop
-  );
 });
+
+// Create a calculate function. It should take in three parameters: the first number, the operator, and the second number.
+const calculate = (n1, operator, n2) => {
+  let result = "";
+  //  Need to convert strings to numbers so that it doesn't concatenate numbers (1 + 1 = 11) instead of calculating. parseFloat converts a string into a float (a number with decimal places)
+  if (operator === "add") {
+    result = parseFloat(n1) + parseFloat(n2);
+  } else if (operator === "subtract") {
+    result = parseFloat(n1) - parseFloat(n2);
+  } else if (operator === "multiply") {
+    result = parseFloat(n1) * parseFloat(n2);
+  } else if (operator === "divide") {
+    result = parseFloat(n1) / parseFloat(n2);
+  }
+
+  return result;
+};
