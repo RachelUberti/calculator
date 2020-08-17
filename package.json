@@ -1,0 +1,23 @@
+{
+  "name": "calculator",
+  "version": "1.0.0",
+  "description": "calculator JWD assessment",
+  "main": "javascript.js",
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine": "^3.6.1"
+  },
+  "scripts": {
+    "test": "jasmine"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/RachelUberti/calculator.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/RachelUberti/calculator/issues"
+  },
+  "homepage": "https://github.com/RachelUberti/calculator#readme"
+}
